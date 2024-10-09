@@ -37,13 +37,12 @@ public class MemberService {
     {
             return this.memberRepository.findAll();
     }
-
-    public Member geMemberById(UUID id)
+    public Member getMemberById(UUID id)
     {
         return this.memberRepository.findById(id).orElse(null);
     }
 
-    public Member geMemberByEmail(String email)
+    public Member getMemberByEmail(String email)
     {
         return this.memberRepository.findByEmail(email).orElse(null);
     }
@@ -63,14 +62,23 @@ public class MemberService {
                 {
                     _member.setMobileNumber(member.getMobileNumber());
                 }
-                _member.setSubscriptionStatus(member.getSubscriptionStatus());
-                _member.setLastName(member.getLastName());
-                _member.setFirstName(member.getFirstName());
+                if(member.getFirstName()!=null)
+                {
+                    _member.setFirstName(member.getFirstName());
+                }
+                if(member.getLastName()!=null)
+                {
+                    _member.setLastName(member.getLastName());
+                }
+                if(member.getSubscriptionStatus()!=null)
+                {
+                    _member.setSubscriptionStatus(member.getSubscriptionStatus());
+                }
                 Member updatedMember= this.memberRepository.save(_member);
                 return new ResponseEntity<>(updatedMember, HttpStatus.CREATED);
             }
             else {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         }
         catch (Exception e)

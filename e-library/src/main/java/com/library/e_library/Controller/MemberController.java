@@ -50,13 +50,12 @@ public class MemberController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-
     }
 
     @GetMapping(value = {"/{id}"},produces = "application/json")
     public ResponseEntity<Member> getMember(@PathVariable UUID id)
     {
-        Member members=this.memberService.geMemberById(id);
+        Member members=this.memberService.getMemberById(id);
         if(members!=null)
         {
             return new ResponseEntity<>(members,HttpStatus.OK);
@@ -74,7 +73,7 @@ public class MemberController {
     @GetMapping(value = {"/get-by-email"},produces = "application/json")
     public ResponseEntity<Member> getMemberByEmail(@RequestParam String email)
     {
-        Member members=this.memberService.geMemberByEmail(email);
+        Member members=this.memberService.getMemberByEmail(email);
         if(members!=null)
         {
             return new ResponseEntity<>(members,HttpStatus.OK);

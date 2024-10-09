@@ -1,5 +1,6 @@
 package com.library.e_library.Model;
 
+import com.library.e_library.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -19,24 +20,11 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
     private String name;
     private String author;
-
     @Column(unique = true)
     private String isbn;
-
     private double price;
     private String description;
     private Category category;
-    public enum Category{
-        FICTION("Fiction"),
-        NON_FICTION("Non_Fiction");
-
-        private final String category;
-        Category(String category)
-        {
-            this.category=category;
-        }
-    }
 }

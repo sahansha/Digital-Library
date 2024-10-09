@@ -1,10 +1,9 @@
 package com.library.e_library.Model;
 
+import com.library.e_library.enums.SubscriptionStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Email;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -15,19 +14,18 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
+@With
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String firstName;
     private String lastName;
-    @Column(unique = true)
     private String mobileNumber;
+    @Email
     @Column(unique = true)
     private String email;
-    private SubscriptionStatus subscriptionStatus;
-
-    private enum SubscriptionStatus{
-        ACTIVE,INACTIVE
-    }
+    @Builder.Default
+    private SubscriptionStatus subscriptionStatus=SubscriptionStatus.INACTIVE;
 }
