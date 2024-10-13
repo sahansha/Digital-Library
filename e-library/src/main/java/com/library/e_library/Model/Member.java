@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -28,4 +29,8 @@ public class Member {
     private String email;
     @Builder.Default
     private SubscriptionStatus subscriptionStatus=SubscriptionStatus.INACTIVE;
+
+
+    @OneToMany(mappedBy = "member")
+    private List<IssueData> issueData;
 }

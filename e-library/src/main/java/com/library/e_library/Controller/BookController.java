@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/book")
@@ -32,6 +33,13 @@ public class BookController {
     {
         List<Book> books=this.bookService.getAllBooks();
         return new ResponseEntity<>(books,HttpStatus.OK);
+    }
+
+    @GetMapping(value = {"/{id}"},produces ="application/json")
+    public ResponseEntity<Book> getBookById(@PathVariable UUID id)
+    {
+        Book book=this.bookService.getBookById(id);
+        return new ResponseEntity<>(book,HttpStatus.OK);
     }
 
 }

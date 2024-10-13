@@ -4,6 +4,8 @@ import com.library.e_library.Model.IssueData;
 import com.library.e_library.Service.IssueDataService;
 import com.library.e_library.dto.IssueDataDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,35 +25,28 @@ public class IssueDataController {
     }
 
     @PostMapping(path = {"/add"},consumes = {"application/json"})
-    public ResponseEntity<IssueData> addIssueData(@RequestBody IssueDataDto issueDataDto)
+    public ResponseEntity<EntityModel<IssueData>> addIssueData(@RequestBody IssueDataDto issueDataDto)
     {
         IssueData addedData=this.issueDataService.addIssueData(issueDataDto);
-        return new ResponseEntity<>(addedData, HttpStatus.CREATED);
+        EntityModel<IssueData> entityModel=EntityModel.of(addedData);
+        WebMvcLinkBuilder link=WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(getClass())
+                                    .getBooksByMemberId(addedData.getId()));
+        entityModel.add(link.withRel("find-by-id"));
+        return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
     }
 
     @GetMapping(path = {"/member/books/{id}"})
     public ResponseEntity<List<IssueData>> getBooksByMemberId(@PathVariable UUID id)
     {
         List<IssueData> issueDataList=this.issueDataService.getIssueDataById(id);
-        if(issueDataList!=null)
-        {
             return new ResponseEntity<>(issueDataList,HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @PatchMapping(path = {"/status"})
     public ResponseEntity<String> updateMembersIssueStatus(@RequestParam UUID id)
     {
         String response=this.issueDataService.updateStatus(id);
-        if(response.equals("updated"))
-        {
-            return new ResponseEntity<>(response,HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(response,HttpStatus.OK);
+
     }
 }

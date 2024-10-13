@@ -6,7 +6,11 @@ import com.library.e_library.Model.Member;
 import com.library.e_library.Repository.IssueDataRepository;
 import com.library.e_library.dto.IssueDataDto;
 import com.library.e_library.enums.IssueStatus;
+import com.library.e_library.exception.IssueDataNotFound;
+import jakarta.validation.constraints.Size;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +19,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
+@EnableAspectJAutoProxy
 public class IssueDataService {
     private final IssueDataRepository issueDataRepository;
     private final MemberService memberService;
@@ -58,12 +64,16 @@ public class IssueDataService {
 
     }
 
-    public List<IssueData> getIssueDataById(UUID id)
-    {
+    public List<IssueData> getIssueDataById(UUID id) {
         try{
-            return this.issueDataRepository.findByMemberId(id);
+            List<IssueData> issueDataList= this.issueDataRepository.findByMemberId(id);
+            if(issueDataList.isEmpty())
+            {
+                throw new IssueDataNotFound("Issue Data not found");
+            }
+            return issueDataList;
         }
-        catch (RuntimeException e)
+        catch (Exception e)
         {
             throw new RuntimeException(e);
         }
@@ -72,11 +82,10 @@ public class IssueDataService {
     public String updateStatus(List<IssueData> issueData)
     {
         try {
-            IssueData issueList=null;
             for(IssueData list:issueData)
             {
-                issueList=IssueData.builder().build().withIssueStatus(IssueStatus.EXPIRED);
-                this.issueDataRepository.save(issueList);
+                list.setIssueStatus(IssueStatus.EXPIRED);
+                this.issueDataRepository.save(list);
             }
             return "updated";
         }
@@ -89,14 +98,16 @@ public class IssueDataService {
     public String updateStatus(UUID memberId)
     {
         try{
-            List<IssueData> issueList=this.issueDataRepository
-                                        .findByMemberId(memberId)
-                                        .stream()
-                                        .filter(issue-> Instant.now().isAfter(issue.getExpirationDate()))
-                                        .toList();
+            List<IssueData> issueList=this.issueDataRepository.findByMemberId(memberId).stream()
+                    .filter(issue-> Instant.now().isAfter(issue.getExpirationDate()))
+                    .toList();;
+            if(issueList.isEmpty())
+            {
+                throw new IssueDataNotFound("Issue Data not found");
+            }
             return this.updateStatus(issueList);
 
-        } catch (RuntimeException e) {
+        } catch (IssueDataNotFound | RuntimeException e) {
             throw new RuntimeException(e);
         }
 

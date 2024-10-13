@@ -2,6 +2,7 @@ package com.library.e_library.Service;
 
 import com.library.e_library.Model.Member;
 import com.library.e_library.Repository.MemberRepository;
+import com.library.e_library.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,8 +30,7 @@ public class MemberService {
         }
         catch (Exception e)
         {
-            log.info("Following Exception Occurred While adding Member : {}",e.getMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
     public List<Member> getAllMembers()
@@ -39,20 +39,45 @@ public class MemberService {
     }
     public Member getMemberById(UUID id)
     {
-        return this.memberRepository.findById(id).orElse(null);
+        try{
+            Member member= this.memberRepository.findById(id).orElse(null);
+            if(member==null)
+            {
+                throw new UserNotFoundException("Member does not Exist");
+            }
+            return member;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public Member getMemberByEmail(String email)
     {
-        return this.memberRepository.findByEmail(email).orElse(null);
+        try{
+            Member member= this.memberRepository.findByEmail(email).orElse(null);
+            if(member==null)
+            {
+                throw new UserNotFoundException("Member does not Exist");
+            }
+            return member;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
-    public ResponseEntity<Member> updateMember(UUID id, Member member)
+    public Member updateMember(UUID id, Member member)
     {
         try{
             Optional<Member> foundMember=this.memberRepository.findById(id);
-            if(foundMember.isPresent())
+            if(foundMember.isEmpty())
             {
+                throw new UserNotFoundException("Member record not available to update");
+            }
                 Member _member=foundMember.get();
                 if(member.getEmail()!=null)
                 {
@@ -74,16 +99,11 @@ public class MemberService {
                 {
                     _member.setSubscriptionStatus(member.getSubscriptionStatus());
                 }
-                Member updatedMember= this.memberRepository.save(_member);
-                return new ResponseEntity<>(updatedMember, HttpStatus.CREATED);
-            }
-            else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return this.memberRepository.save(_member);
         }
         catch (Exception e)
         {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException(e);
         }
     }
 }

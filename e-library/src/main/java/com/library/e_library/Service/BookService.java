@@ -2,6 +2,7 @@ package com.library.e_library.Service;
 
 import com.library.e_library.Model.Book;
 import com.library.e_library.Repository.BookRepository;
+import com.library.e_library.exception.BookNotFountException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -31,19 +32,41 @@ public class BookService {
 
     public Book addBook(Book book)
     {
-      log.info("Saving a new book");
-        Book savedBook= this.bookRepository.save(book);
-        log.info("Saved a new Book with Id: {}",savedBook.getId());
-        return savedBook;
+        try{
+            return this.bookRepository.save(book);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
     }
     public List<Book> getAllBooks()
     {
-        return this.bookRepository.findAll();
+        try{
+            return this.bookRepository.findAll();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public Book getBookById(UUID id)
     {
-        return this.bookRepository.findById(id).orElse(new Book());
+        try{
+            Book book= this.bookRepository.findById(id).orElse(null);
+            if(book==null)
+            {
+                throw new BookNotFountException(String.format("Book with id : %s is not available",id));
+            }
+            return book;
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
 

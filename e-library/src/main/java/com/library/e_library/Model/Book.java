@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -27,4 +28,7 @@ public class Book {
     private double price;
     private String description;
     private Category category;
+
+    @OneToMany(mappedBy = "book")
+    private List<IssueData> issueData;
 }
