@@ -1,5 +1,6 @@
 package com.library.e_library.Model;
 
+import com.library.e_library.enums.MemberRoles;
 import com.library.e_library.enums.SubscriptionStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -27,6 +28,14 @@ public class Member {
     @Email
     @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
+    private String username;
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private MemberRoles role;
+
     @Builder.Default
     private SubscriptionStatus subscriptionStatus=SubscriptionStatus.INACTIVE;
 

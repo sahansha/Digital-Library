@@ -14,18 +14,15 @@ import java.time.LocalDateTime;
 @Slf4j
 public class LoggingAop {
 
-    @AfterThrowing(pointcut = "execution(* com.library.e_library.*.*.*(..))", throwing = "ex")
+  /*  @AfterThrowing(pointcut = "execution(* com.library.e_library.*.*.*(..))", throwing = "ex")
     public void logException(JoinPoint jp, Exception ex)
     {
         log.info("{} Exception occurred in method {} at {}", ex.getMessage(), jp.getSignature().getName(), LocalDateTime.now());
-    }
+    }*/
 
-    @AfterReturning(pointcut = "execution(* com.library.e_library.*.*.*(..))")
+    @AfterReturning(pointcut = "execution(* com.library.e_library.Service.*.*(..))")
     public void logMethodSuccess(JoinPoint jp)
     {
         log.info("Method execution successful  {}", jp.getSignature().getName());
     }
-
-
-
 }

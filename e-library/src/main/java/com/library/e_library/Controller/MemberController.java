@@ -2,7 +2,9 @@ package com.library.e_library.Controller;
 
 import com.library.e_library.Model.Book;
 import com.library.e_library.Model.Member;
+import com.library.e_library.Service.JwtService;
 import com.library.e_library.Service.MemberService;
+import com.library.e_library.dto.MemberAuthDto;
 import com.library.e_library.exception.UserNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,9 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +25,16 @@ import java.util.UUID;
 public class MemberController {
 
     private final MemberService memberService;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final JwtService jwtService;
     @Autowired
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService
+            ,AuthenticationManager authenticationManager,JwtService jwtService) {
         this.memberService = memberService;
+        this.authenticationManager=authenticationManager;
+        this.jwtService=jwtService;
     }
 
     @PostMapping(path = {"/add"},consumes = "application/json")
@@ -79,6 +91,18 @@ public class MemberController {
         entityModel.add(webMvcLinkBuilder.withRel("member-by-id"));
         return new ResponseEntity<>(entityModel,HttpStatus.OK);
 
+    }
+
+    @PostMapping("/login")
+    public String authLogin(@RequestBody MemberAuthDto memberAuthDto)
+    {
+        Authentication authentication=this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(memberAuthDto.getUsername(),memberAuthDto.getPassword())        );
+        if(authentication.isAuthenticated())
+        {
+            return jwtService.generateToken(memberAuthDto.getUsername());
+        }
+        return "Not Authorized";
     }
 
 }

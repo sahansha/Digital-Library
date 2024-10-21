@@ -1,8 +1,8 @@
 package com.library.e_library.Service;
 
-import com.library.e_library.Model.User;
+import com.library.e_library.Model.Member;
 import com.library.e_library.Model.UserPrincipal;
-import com.library.e_library.Repository.UserRepository;
+import com.library.e_library.Repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserDetailService implements UserDetailsService {
-    UserRepository userRepository;
+   private final MemberRepository memberRepository;
 
-    public UserDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user=this.userRepository.findByUsername(username);
-        if(user==null)
+        Member member=this.memberRepository.findByUsername(username).orElse(null);
+        if(member==null)
         {
             System.out.println("User not found");
             throw new UsernameNotFoundException("User not found");
         }
-        return new UserPrincipal(user);
+        return new UserPrincipal(member);
     }
 }

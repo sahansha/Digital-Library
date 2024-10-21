@@ -11,10 +11,10 @@ import java.util.Collections;
 
 @Component
 public class UserPrincipal implements UserDetails {
-    private final User user;
+    private final Member member;
 
-    public UserPrincipal(User user) {
-        this.user = user;
+    public UserPrincipal(Member member) {
+        this.member = member;
     }
 
     @Override
@@ -39,16 +39,16 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(this.user.getRole()));
+        return Collections.singletonList(new SimpleGrantedAuthority(this.member.getRole().toString()));
     }
 
     @Override
     public String getUsername() {
-        return this.user.getUsername();
+        return this.member.getUsername();
     }
 
     @Override
     public String getPassword() {
-        return this.user.getPassword();
+        return this.member.getPassword();
     }
 }
